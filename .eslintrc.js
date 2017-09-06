@@ -12,6 +12,7 @@ module.exports = {
     sinon: 'false'
   },
   rules: {
+    "no-case-declarations": 'off',
     "react/no-unescaped-entities": 'off',
     "react/forbid-prop-types": 'off',
     "max-len": [2, 320],

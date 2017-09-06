@@ -28,9 +28,9 @@ class Filters extends Component {
           <label htmlFor="sort">Sort:</label>
           <select id="sort" value={query.sort} onChange={e => this.updateFilter('sort', e.target.value)}>
             <option value="name">Name</option>
-            <option value="stars">Stars</option>
-            <option value="issues">Issues</option>
-            <option value="updated">Updated</option>
+            <option value="stargazers_count">Stars</option>
+            <option value="open_issues_count">Issues</option>
+            <option value="updated_at">Updated</option>
           </select>
           <label htmlFor="order">Sort order:</label>
           <select id="order" value={query.order} onChange={e => this.updateFilter('order', e.target.value)}>
@@ -57,15 +57,15 @@ class Filters extends Component {
           <label htmlFor="issues">Has issues:</label>
           <input
             type="checkbox"
-            checked={query.hasIssues}
+            checked={query.issues !== undefined}
             id="issues"
             value=""
-            onChange={e => this.updateFilter('hasIssues', e.target.checked)}
+            onChange={e => this.updateFilter('issues', e.target.checked)}
           />
           <label htmlFor="topics">Has topics:</label>
           <input
             type="checkbox"
-            checked={query.topics}
+            checked={query.topics !== undefined}
             id="topics"
             value=""
             onChange={e => this.updateFilter('topics', e.target.checked)}

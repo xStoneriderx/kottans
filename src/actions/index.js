@@ -14,12 +14,13 @@ const getNextPageUrl = (response) => {
 
 const callApi = (endpoint) => {
   const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint
+  const headers = new Headers()
+  headers.append('Accept', 'application/vnd.github.mercy-preview+json') // Needed to get repo topics
 
-  return fetch(fullUrl)
+  return fetch(fullUrl, { headers })
     .then(response =>
       response.json().then((json) => {
         if (!response.ok) return Promise.reject(json)
-
         const nextPageUrl = getNextPageUrl(response)
         return Object.assign({},
           { data: json },
@@ -34,7 +35,7 @@ export const getRepos = endPoint => (dispatch) => {
   return callApi(fullEndPoint).then((response) => {
     return dispatch({
       type: 'REPOS_SUCCESSFUL',
-      payload: { ...response, data: response.data.map(item => ({ ...item, updated_at: Date.parse(item.updated_at)/1000 })) }
+      payload: { ...response, data: response.data.map(item => ({ ...item, updated_at: Date.parse(item.updated_at) / 1000 })) }
     })
   })
 }
