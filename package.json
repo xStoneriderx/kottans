@@ -6,10 +6,13 @@
     "humps": "^2.0.1",
     "normalizr": "^3.2.3",
     "prop-types": "latest",
+    "query-string": "^5.0.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
+    "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
+    "react-timestamp": "^4.2.1",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0"
   },

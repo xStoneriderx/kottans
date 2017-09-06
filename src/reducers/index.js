@@ -3,11 +3,11 @@ import merge from 'lodash/merge'
 //import paginate from './paginate'
 import { combineReducers } from 'redux'
 
-const repos = (state = {}, action) => {
-  const { type, repos } = action
+const repos = (state = { data: [] }, action) => {
+  const { type, payload } = action
   switch (type) {
     case 'REPOS_SUCCESSFUL':
-      return repos
+      return payload
     default:
       return state
   }
