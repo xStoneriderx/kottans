@@ -10,8 +10,7 @@ import * as _ from 'lodash'
 
 class Repos extends Component {
   static propTypes = {
-    user: PropTypes.string.isRequired,
-    repos: PropTypes.array.isRequired
+    user: PropTypes.string.isRequired
   }
 
   componentWillMount() {
@@ -24,88 +23,102 @@ class Repos extends Component {
     }
   }
 
-  filterRepos(){
-    const { query, repos } = this.props
-    if (!Object.keys(query).length) return (repos)
-    let filteredRepos = _.cloneDeep(repos)
-    for (const key in query) {
-      if (query[key] === 'all') continue
-      switch (key) {
-        case 'sort':
-          const order = query.order === 'asc' ? 1 : -1 // eslint-disable-line no-case-declarations
-          filteredRepos = filteredRepos.sort((a, b) => {
-            return query.sort === 'name'
-              ? a[query.sort].toLowerCase() > b[query.sort].toLowerCase() ? order : -1 * order
-              : a[query.sort] > b[query.sort] ? order : -1 * order;
-          })
-          break;
-        case 'language':
-          filteredRepos = filteredRepos.filter(item => item.language === query.language)
-          break;
-        case 'type':
-          filteredRepos = filteredRepos.filter(item => item.fork === true && query.type === 'forked')
-          break;
-        case 'updated':
-          filteredRepos = filteredRepos.filter(item => item.updated_at >= Date.parse(query.updated) / 1000)
-          break;
-        case 'issues':
-          filteredRepos = filteredRepos.filter(item => item.has_issues === true)
-          break;
-        case 'topics':
-          filteredRepos = filteredRepos.filter(item => item.topics.length > 0)
-          break;
-        case 'starred':
-          filteredRepos = filteredRepos.filter(item => item.stargazers_count >= query.starred)
-          break;
-      }
-    }
-    return filteredRepos
+  openRepo = (repoId) => {
+    const repo = this.props.filteredRepos[repoId]
+    this.props.openModal(repo)
   }
 
-  openRepo = (repoId) => {
-    const repo = this.props.repos[repoId]
-    this.props.openModal(repo)
+  renderRepos() {
+    const { filteredRepos, isFetching, errorMessage } = this.props
+    const isEmpty = filteredRepos.length === 0
+    if (isEmpty && isFetching && !errorMessage) {
+      return <h2>Loading data, please wait...</h2>
+    } else if (isEmpty && !errorMessage) {
+      return <h2>Nothing to show :(</h2>
+    }
+    return (
+      filteredRepos.map((repo, index) => {
+        repo.slicedDescription = repo.description ? `${repo.description.slice(0, 60)} ...` : '' // eslint-disable-line no-param-reassign
+        return (
+          <Repo
+            id={index}
+            repo={repo}
+            onClick={this.openRepo}
+            key={repo.id}
+          />
+        )
+      })
+    )
+  }
+
+  renderError() {
+    const { errorMessage } = this.props
+    return errorMessage ? <h2>{errorMessage}</h2> : ''
   }
 
   render() {
     const { user } = this.props
-    const filteredRepos = this.filterRepos()
-    console.log(filteredRepos)
     return (
       <div>
         <Filters />
         <p>{user}</p>
-        {filteredRepos.map((repo, index) => {
-          repo.description = repo.description ? `${repo.description.slice(0, 60)} ...` : '' // eslint-disable-line no-param-reassign
-          return (
-            <Repo
-              id={index}
-              repoName={repo.name}
-              description={repo.description}
-              starsCount={repo.stargazers_count}
-              updatedDate={repo.updated_at}
-              language={repo.language}
-              isFork={repo.fork}
-              onClick={this.openRepo}
-              key={repo.id}
-            />
-          )
-        })}
+        {this.renderError()}
+        {this.renderRepos()}
       </div>
     )
   }
 }
+function filterRepos(repos, query) {
+  if (!Object.keys(query).length) return (repos)
+  let filteredRepos = _.cloneDeep(repos)
+  for (const key in query) {
+    if (query[key] === 'all') continue
+    switch (key) {
+      case 'sort':
+        const order = query.order === 'asc' ? 1 : -1 // eslint-disable-line no-case-declarations
+        filteredRepos = filteredRepos.sort((a, b) => {
+          return query.sort === 'name'
+            ? a[query.sort].toLowerCase() > b[query.sort].toLowerCase() ? order : -1 * order
+            : a[query.sort] > b[query.sort] ? order : -1 * order;
+        })
+        break;
+      case 'language':
+        filteredRepos = filteredRepos.filter(item => item.language === query.language)
+        break;
+      case 'type':
+        filteredRepos = filteredRepos.filter(item => item.fork === true && query.type === 'forked')
+        break;
+      case 'updated':
+        filteredRepos = filteredRepos.filter(item => item.updated_at >= Date.parse(query.updated) / 1000)
+        break;
+      case 'issues':
+        filteredRepos = filteredRepos.filter(item => item.has_issues === true)
+        break;
+      case 'topics':
+        filteredRepos = filteredRepos.filter(item => item.topics.length > 0)
+        break;
+      case 'starred':
+        filteredRepos = filteredRepos.filter(item => item.stargazers_count >= query.starred)
+        break;
+      default :
+    }
+  }
+  return filteredRepos
+}
 
 const mapStateToProps = (state, ownProps) => {
-  // We need to lower case the login due to the way GitHub's API behaves.
-  // Have a look at ../middleware/api.js for more details.
+  const { isFetching } = state.repos
+  const { errorMessage } = state
   const user = ownProps.match.params.user
-  const repos = Object.values(state.repos.data)
+  const repos = state.repos.data
   const query = queryString.parse(ownProps.location.search)
+  const filteredRepos = filterRepos(repos, query)
   return {
     user,
-    repos,
-    query
+    filteredRepos,
+    query,
+    isFetching,
+    errorMessage
   }
 }
 

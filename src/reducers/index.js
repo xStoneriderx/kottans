@@ -1,31 +1,61 @@
-//import * as ActionTypes from '../actions'
-import merge from 'lodash/merge'
-//import paginate from './paginate'
 import { combineReducers } from 'redux'
 
-const repos = (state = { data: [] }, action) => {
+const repos = (state = {
+  data: [],
+  isFetching: false,
+  nextPageUrl: undefined
+}, action) => {
   const { type, payload } = action
   switch (type) {
-    case 'REPOS_SUCCESSFUL':
-      return payload
+    case 'GET_REPOS_REQUEST':
+      return { data: [], isFetching: true, nextPageUrl: undefined }
+    case 'GET_REPOS_SUCCESSFUL':
+      return {
+        ...state,
+        isFetching: false,
+        data: payload.data,
+        nextPageUrl: payload.nextPageUrl
+      }
     default:
       return state
   }
 }
 
-// Updates error message to notify about the failed fetches.
-const errorMessage = (state = null, action) => {
-  const { error } = action
-
-  if (error) {
-    return error
+const modal = (state = { modalIsOpen: false, data: {} }, action) => {
+  const { type, payload } = action
+  switch (type) {
+    case 'MODAL_HIDE':
+      return { modalIsOpen: false, data: {} }
+    case 'MODAL_INIT':
+      return {
+        modalIsOpen: true, data: {}
+      }
+    case 'MODAL_SHOW':
+      return {
+        ...state,
+        data: payload.data
+      }
+    default:
+      return state
   }
+}
 
-  return state
+const errorMessage = (state = null, action) => {
+  const { type, error } = action
+
+  switch (type) {
+    case 'CLEAR_ERROR':
+      return null
+    case 'ADD_ERROR':
+      return error
+    default:
+      return state
+  }
 }
 
 const rootReducer = combineReducers({
   repos,
+  modal,
   errorMessage,
 })
 

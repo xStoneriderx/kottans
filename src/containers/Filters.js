@@ -6,7 +6,6 @@ import queryString from 'query-string'
 
 class Filters extends Component {
   static propTypes = {
-    //repos: PropTypes.array.isRequired,
     query: PropTypes.object.isRequired,
   }
 
@@ -21,7 +20,7 @@ class Filters extends Component {
   }
 
   render() {
-    const { query, repos } = this.props
+    const { query, languages } = this.props
     return (
       <div>
         <div>
@@ -40,6 +39,7 @@ class Filters extends Component {
           <label htmlFor="language">Language:</label>
           <select id="language" value={query.language} onChange={e => this.updateFilter('language', e.target.value)} >
             <option value="all">All</option>
+            {Array.from(languages).map((lang) => <option key={lang} value={lang}>{lang}</option>)}
           </select>
           <label htmlFor="type">Type:</label>
           <select id="type" value={query.type} onChange={e => this.updateFilter('type', e.target.value)}>
@@ -51,7 +51,7 @@ class Filters extends Component {
           <input
             id="updated"
             type="date"
-            value={query.updated || 0}
+            value={query.updated || ''}
             onChange={e => this.updateFilter('updated', e.target.value)}
           />
           <label htmlFor="issues">Has issues:</label>
@@ -84,12 +84,20 @@ class Filters extends Component {
   }
 }
 
+function getLanguages(repos) {
+  const languages = new Set()
+  repos.forEach(item => (item.language !== null ? languages.add(item.language) : ''))
+  return languages
+}
+
 const mapStateToProps = (state, ownProps) => {
   const query = queryString.parse(ownProps.location.search)
   const defaultQuery = { sort: 'name', order: 'asc', language: 'all', type: 'all' }
+  const languages = getLanguages(state.repos.data)
 
   return ({
-    query: Object.assign({}, defaultQuery, query)
+    query: Object.assign({}, defaultQuery, query),
+    languages
   })
 }
 

@@ -1,17 +1,13 @@
+/* eslint-disable camelcase */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Timestamp from 'react-timestamp'
+import NumericLabel from 'react-pretty-numbers'
 
 export default class Repo extends Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
-    repoName: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    starsCount: PropTypes.number.isRequired,
-    updatedDate: PropTypes.number.isRequired,
-    url: PropTypes.string.isRequired,
-    language: PropTypes.string,
-    isFork: PropTypes.bool.isRequired,
+    repo: PropTypes.object.isRequired,
     onClick: PropTypes.func.isRequired
   }
 
@@ -25,7 +21,7 @@ export default class Repo extends Component {
   }
 
   render() {
-    const { repoName, description, starsCount, updatedDate, language, isFork } = this.props
+    const { repoName, updatedDate, slicedDescription, stargazers_count, language, isFork } = this.props.repo
     return (
       <div onClick={this.handleOnClick} style={{ width: '400px', display: 'inline-block', margin: '10px', padding: '10px', border: '2px black solid' }}>
         <div>
@@ -33,10 +29,10 @@ export default class Repo extends Component {
           <Timestamp time={updatedDate} />
         </div>
         <div>
-          {description}
+          {slicedDescription}
         </div>
         <div>
-          {starsCount}
+          <NumericLabel params={{ shortFormat: true, cssClass: ['class'] }}>{stargazers_count}</NumericLabel>
           {language}
           {isFork ? 'Forked' : ''}
         </div>

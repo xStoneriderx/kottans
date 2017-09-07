@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import Form from '../components/Form'
+import RepoModal from '../containers/RepoModal'
 
 class App extends Component {
   static propTypes = {
@@ -17,10 +18,13 @@ class App extends Component {
   render() {
     const { inputValue } = this.props
     return (
-      <Form
-        value={inputValue}
-        onSubmit={this.handleInput}
-      />
+      <div>
+        <Form
+          value={inputValue}
+          onSubmit={this.handleInput}
+        />
+        <RepoModal />
+      </div>
     )
   }
 }
