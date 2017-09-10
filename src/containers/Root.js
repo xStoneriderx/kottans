@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Provider } from 'react-redux'
 import { Route } from 'react-router-dom'
 import App from './App'
-import Repos from './Repos'
+import List from './List'
 
 const Root = ({ store }) => (
   <Provider store={store}>
@@ -11,7 +11,7 @@ const Root = ({ store }) => (
       <Route path="/" component={App} />
       <Route
         path="/:user"
-        component={Repos}
+        component={List}
       />
     </div>
   </Provider>

@@ -21,20 +21,29 @@ export default class Repo extends Component {
   }
 
   render() {
-    const { repoName, updatedDate, slicedDescription, stargazers_count, language, isFork } = this.props.repo
+    const { name, updatedDate, slicedDescription, stargazers_count, language, isFork } = this.props.repo
+    const { hideLanguage, hideType } = this.props
     return (
       <div onClick={this.handleOnClick} style={{ width: '400px', display: 'inline-block', margin: '10px', padding: '10px', border: '2px black solid' }}>
         <div>
-          {repoName}
-          <Timestamp time={updatedDate} />
+          Name: {name}
+          Time: <Timestamp time={updatedDate} />
         </div>
         <div>
-          {slicedDescription}
+          Desc: {slicedDescription}
         </div>
         <div>
           <NumericLabel params={{ shortFormat: true, cssClass: ['class'] }}>{stargazers_count}</NumericLabel>
-          {language}
-          {isFork ? 'Forked' : ''}
+          {!hideLanguage &&
+            <div>
+              Lang: {language}
+            </div>
+          }
+          {!hideType &&
+          <div>
+            Status: {isFork ? 'Forked' : 'Source'}
+          </div>
+          }
         </div>
       </div>
     )

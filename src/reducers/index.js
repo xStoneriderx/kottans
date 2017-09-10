@@ -3,37 +3,60 @@ import { combineReducers } from 'redux'
 const repos = (state = {
   data: [],
   isFetching: false,
-  nextPageUrl: undefined
+  nextPageUrl: undefined,
+  owner: {}
 }, action) => {
   const { type, payload } = action
   switch (type) {
     case 'GET_REPOS_REQUEST':
-      return { data: [], isFetching: true, nextPageUrl: undefined }
+      return { data: [], isFetching: true, nextPageUrl: undefined, owner: {} }
     case 'GET_REPOS_SUCCESSFUL':
       return {
         ...state,
         isFetching: false,
         data: payload.data,
+        owner: payload.owner,
         nextPageUrl: payload.nextPageUrl
+      }
+    case 'ADD_REPOS_SUCCESSFUL':
+      return {
+        ...state,
+        isFetching: false,
+        data: state.data.concat(payload.data),
+        nextPageUrl: payload.nextPageUrl
+      }
+    case 'ADD_ERROR':
+      return {
+        ...state,
+        isFetching: false
       }
     default:
       return state
   }
 }
 
-const modal = (state = { modalIsOpen: false, data: {} }, action) => {
+const modal = (state = { modalIsOpen: false, isFetching: false, data: [] }, action) => {
   const { type, payload } = action
   switch (type) {
     case 'MODAL_HIDE':
-      return { modalIsOpen: false, data: {} }
+      return { ...state, modalIsOpen: false }
     case 'MODAL_INIT':
       return {
-        modalIsOpen: true, data: {}
+        modalIsOpen: true,
+        isFetching: true,
+        data: []
       }
     case 'MODAL_SHOW':
       return {
+        modalIsOpen: true,
+        isFetching: false,
+        data: payload.data,
+        repo_url: payload.repo_url
+      }
+    case 'ADD_ERROR':
+      return {
         ...state,
-        data: payload.data
+        isFetching: false,
       }
     default:
       return state

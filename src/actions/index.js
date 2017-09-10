@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const API_ROOT = 'https://api.github.com/'
 
 const getNextPageUrl = (response) => {
@@ -42,10 +43,32 @@ export const getRepos = endPoint => (dispatch) => {
     dispatch({
       type: 'GET_REPOS_SUCCESSFUL',
       payload: { ...response,
-        data: response.data.map(item => ({ ...item, updated_at: Date.parse(item.updated_at) / 1000 })) }
+        data: response.data.map(item => ({ ...item, updated_at: Date.parse(item.updated_at) / 1000 })),
+        owner: response.data[0].owner
+      }
     }),
-  error => dispatch({ type: 'ADD_ERROR', error: error.message })
-  )
+  (error) => {
+    error.message = error.documentation_url && 'Sorry, API rate limit exceeded, try again later.'
+    dispatch({ type: 'ADD_ERROR', error: error.message })
+  })
+}
+
+export const addRepos = endPoint => (dispatch) => {
+  dispatch({
+    type: 'CLEAR_ERROR'
+  })
+  return callApi(endPoint).then(response =>
+    dispatch({
+      type: 'ADD_REPOS_SUCCESSFUL',
+      payload: { ...response,
+        data: response.data.map(item => ({ ...item, updated_at: Date.parse(item.updated_at) / 1000 })),
+        owner: response.data[0].owner
+      }
+    }),
+  (error) => {
+    error.message = error.documentation_url && 'Sorry, API rate limit exceeded, try again later.'
+    dispatch({ type: 'ADD_ERROR', error: error.message })
+  })
 }
 
 export const openModal = repo => (dispatch) => {
@@ -61,7 +84,8 @@ export const openModal = repo => (dispatch) => {
     dispatch({
       type: 'MODAL_SHOW',
       payload: {
-        data
+        data,
+        repo_url: repo.html_url
       }
     })
   },

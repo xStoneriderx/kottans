@@ -39,7 +39,7 @@ class Filters extends Component {
           <label htmlFor="language">Language:</label>
           <select id="language" value={query.language} onChange={e => this.updateFilter('language', e.target.value)} >
             <option value="all">All</option>
-            {Array.from(languages).map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+            {Array.from(languages).map(lang => <option key={lang} value={lang}>{lang}</option>)}
           </select>
           <label htmlFor="type">Type:</label>
           <select id="type" value={query.type} onChange={e => this.updateFilter('type', e.target.value)}>
@@ -93,7 +93,7 @@ function getLanguages(repos) {
 const mapStateToProps = (state, ownProps) => {
   const query = queryString.parse(ownProps.location.search)
   const defaultQuery = { sort: 'name', order: 'asc', language: 'all', type: 'all' }
-  const languages = getLanguages(state.repos.data)
+  const languages = getLanguages(ownProps.reposFilteredWithoutLang)
 
   return ({
     query: Object.assign({}, defaultQuery, query),
