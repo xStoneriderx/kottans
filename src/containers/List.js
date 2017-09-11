@@ -1,3 +1,4 @@
+/* eslint-disable no-continue,no-restricted-syntax */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -12,7 +13,21 @@ import InfiniteScroll from 'react-infinite-scroller'
 
 class List extends Component {
   static propTypes = {
-    user: PropTypes.string.isRequired
+    user: PropTypes.string.isRequired,
+    getRepos: PropTypes.func.isRequired,
+    openModal: PropTypes.func.isRequired,
+    filteredRepos: PropTypes.array.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    reposFilteredWithoutLang: PropTypes.array.isRequired,
+    nextPageUrl: PropTypes.string.isRequired,
+    addRepos: PropTypes.func.isRequired,
+    errorMessage: PropTypes.string.isRequired,
+    query: PropTypes.object.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.loadMore = this.loadMore.bind(this)
   }
 
   componentWillMount() {
@@ -30,20 +45,9 @@ class List extends Component {
     this.props.openModal(repo)
   }
 
-  renderOwner() {
-    const { owner, isFetching } = this.props
-    const isEmpty = !Object.keys(owner).length
-    if (isEmpty && isFetching) {
-      return <Preloader />
-    } else if (isEmpty && !isFetching) return null
-    return (
-      <div>
-        {owner.login}
-        <a href={owner.html_url} target="_blank">
-          <img src={owner.avatar_url} alt={owner.login} />
-        </a>
-      </div>
-    )
+  loadMore() {
+    const { nextPageUrl, addRepos } = this.props
+    addRepos(nextPageUrl)
   }
 
   renderRepos() {
@@ -57,19 +61,21 @@ class List extends Component {
       return <h2>Nothing to show :(</h2>
     }
     return (
-      filteredRepos.map((repo, index) => {
-        repo.slicedDescription = repo.description ? `${repo.description.slice(0, 60)} ...` : '' // eslint-disable-line no-param-reassign
-        return (
-          <Repo
-            hideLanguage={hideLanguage}
-            hideType={hideType}
-            id={index}
-            repo={repo}
-            onClick={this.openRepo}
-            key={repo.id}
-          />
-        )
-      })
+      <div className="repos-container">
+        {filteredRepos.map((repo, index) => {
+          repo.slicedDescription = repo.description ? `${repo.description.slice(0, 60)} ...` : '' // eslint-disable-line no-param-reassign
+          return (
+            <Repo
+              hideLanguage={hideLanguage}
+              hideType={hideType}
+              id={index}
+              repo={repo}
+              onClick={this.openRepo}
+              key={repo.id}
+            />
+          )
+        })}
+      </div>
     )
   }
 
@@ -78,23 +84,17 @@ class List extends Component {
     return errorMessage ? <h2>{errorMessage}</h2> : ''
   }
 
-  loadMore() {
-    const { nextPageUrl, addRepos } = this.props
-    addRepos(nextPageUrl)
-  }
-
   render() {
     const { reposFilteredWithoutLang, nextPageUrl } = this.props
     return (
-      <div>
+      <div className="main-container">
         <Filters reposFilteredWithoutLang={reposFilteredWithoutLang} />
-        {this.renderOwner()}
         {this.renderError()}
         <InfiniteScroll
           pageStart={0}
-          loadMore={this.loadMore.bind(this)}
+          loadMore={this.loadMore}
           hasMore={!!nextPageUrl}
-          loader={<div className="loader">Loading ...</div>}
+          loader={<Preloader />}
         >
           {this.renderRepos()}
         </InfiniteScroll>
@@ -146,7 +146,7 @@ function filterRepos(repos, query) {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { isFetching, owner, nextPageUrl } = state.repos
+  const { isFetching, nextPageUrl } = state.repos
   const { errorMessage } = state
   const user = ownProps.match.params.user
   const repos = state.repos.data
@@ -159,7 +159,6 @@ const mapStateToProps = (state, ownProps) => {
     query,
     isFetching,
     errorMessage,
-    owner,
     nextPageUrl
   }
 }

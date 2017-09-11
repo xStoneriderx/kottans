@@ -4,11 +4,11 @@ const API_ROOT = 'https://api.github.com/'
 const getNextPageUrl = (response) => {
   const link = response.headers.get('link')
   if (!link) {
-    return null
+    return ''
   }
   const nextLink = link.split(',').find(s => s.indexOf('rel="next"') > -1)
   if (!nextLink) {
-    return null
+    return ''
   }
   return nextLink.split(';')[0].slice(1, -1)
 }
@@ -21,7 +21,7 @@ const callApi = (endpoint) => {
   return fetch(fullUrl, { headers })
     .then(response =>
       response.json().then((json) => {
-        if (!response.ok) return Promise.reject(json)
+        if (!response.ok) return Promise.reject({ ...json, status: response.status })
         const nextPageUrl = getNextPageUrl(response)
         return Object.assign({},
           { data: json },
@@ -48,7 +48,7 @@ export const getRepos = endPoint => (dispatch) => {
       }
     }),
   (error) => {
-    error.message = error.documentation_url && 'Sorry, API rate limit exceeded, try again later.'
+    error.message = error.status === 403 ? 'Sorry, API rate limit exceeded, try again later.' : error.message
     dispatch({ type: 'ADD_ERROR', error: error.message })
   })
 }
@@ -76,7 +76,7 @@ export const openModal = repo => (dispatch) => {
     type: 'MODAL_INIT'
   })
   const repoUrls = [
-    `${repo.contributors_url}?sort=popularity$direction=desc$per_page=3`,
+    `${repo.contributors_url}?sort=popularity&direction=desc&per_page=3`,
     repo.languages_url,
     `${repo.url}/pulls?sort=popularity&direction=desc&per_page=5`
   ]

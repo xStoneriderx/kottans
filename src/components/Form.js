@@ -30,7 +30,7 @@ export default class Form extends Component {
   render() {
     return (
       <div>
-        <p>Type a username: </p>
+        <h4>Type a username/organization: </h4>
         <input
           size="45"
           ref={input => this.input = input}

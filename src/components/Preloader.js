@@ -3,7 +3,7 @@ import React from 'react'
 export default function Preloader() {
   return (
     <div>
-      Loading data, please wait...
+      <img src={require('../assets/img/giphy.gif')} alt="Data loading" />
     </div>
   )
 }

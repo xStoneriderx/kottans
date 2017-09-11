@@ -18,7 +18,7 @@ class App extends Component {
   render() {
     const { inputValue } = this.props
     return (
-      <div>
+      <div className="search-header">
         <Form
           value={inputValue}
           onSubmit={this.handleInput}

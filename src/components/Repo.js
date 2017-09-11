@@ -8,7 +8,9 @@ export default class Repo extends Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     repo: PropTypes.object.isRequired,
-    onClick: PropTypes.func.isRequired
+    onClick: PropTypes.func.isRequired,
+    hideLanguage: PropTypes.bool.isRequired,
+    hideType: PropTypes.bool.isRequired,
   }
 
   constructor(props) {
@@ -24,7 +26,7 @@ export default class Repo extends Component {
     const { name, updatedDate, slicedDescription, stargazers_count, language, isFork } = this.props.repo
     const { hideLanguage, hideType } = this.props
     return (
-      <div onClick={this.handleOnClick} style={{ width: '400px', display: 'inline-block', margin: '10px', padding: '10px', border: '2px black solid' }}>
+      <div onClick={this.handleOnClick} className="repo">
         <div>
           Name: {name}
           Time: <Timestamp time={updatedDate} />
@@ -33,7 +35,7 @@ export default class Repo extends Component {
           Desc: {slicedDescription}
         </div>
         <div>
-          <NumericLabel params={{ shortFormat: true, cssClass: ['class'] }}>{stargazers_count}</NumericLabel>
+          <NumericLabel params={{ shortFormat: true, cssClass: ['stars'] }}>{stargazers_count}</NumericLabel> stars
           {!hideLanguage &&
             <div>
               Lang: {language}

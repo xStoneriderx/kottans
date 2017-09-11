@@ -3,13 +3,13 @@ import { combineReducers } from 'redux'
 const repos = (state = {
   data: [],
   isFetching: false,
-  nextPageUrl: undefined,
+  nextPageUrl: '',
   owner: {}
 }, action) => {
   const { type, payload } = action
   switch (type) {
     case 'GET_REPOS_REQUEST':
-      return { data: [], isFetching: true, nextPageUrl: undefined, owner: {} }
+      return { data: [], isFetching: true, nextPageUrl: '', owner: {} }
     case 'GET_REPOS_SUCCESSFUL':
       return {
         ...state,
@@ -63,12 +63,12 @@ const modal = (state = { modalIsOpen: false, isFetching: false, data: [] }, acti
   }
 }
 
-const errorMessage = (state = null, action) => {
+const errorMessage = (state = '', action) => {
   const { type, error } = action
 
   switch (type) {
     case 'CLEAR_ERROR':
-      return null
+      return ''
     case 'ADD_ERROR':
       return error
     default:
